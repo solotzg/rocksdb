@@ -15,7 +15,8 @@ class TitanTableFactory : public TableFactory {
         base_factory_(options.table_factory),
         blob_manager_(blob_manager) {}
 
-  const char* Name() const override { return "TitanTable"; }
+  //const char* Name() const override { return "TitanTable"; }
+  const char* Name() const override { return "BlockBasedTable"; }
 
   Status NewTableReader(
       const TableReaderOptions& options,

@@ -822,7 +822,7 @@ Status RocksDBOptionsParser::VerifyTableFactory(
           "[RocksDBOptionsParser]: "
           "failed the verification on TableFactory->Name()");
     }
-    if (base_tf->Name() == BlockBasedTableFactory::kName) {
+    if (0 && base_tf->Name() == BlockBasedTableFactory::kName) {
       return VerifyBlockBasedTableFactory(
           static_cast_with_check<const BlockBasedTableFactory,
                                  const TableFactory>(base_tf),
