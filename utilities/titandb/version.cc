@@ -35,7 +35,7 @@ std::weak_ptr<BlobFileMeta> BlobStorage::FindFile(uint64_t file_number) {
 void BlobStorage::ComputeGCScore() {
   gc_score_.clear();
   for (auto& file : files_) {
-    gc_score_.push_back({});
+    gc_score_.push_back({0, 0});
     auto& gcs = gc_score_.back();
     gcs.file_number = file.first;
     if (file.second->marked_for_gc) {

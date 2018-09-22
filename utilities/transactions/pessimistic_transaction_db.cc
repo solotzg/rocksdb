@@ -256,7 +256,7 @@ Status TransactionDB::OpenTitanDB(
   titandb::TitanDBOptions db_options_2pc = db_options;
   PrepareWrapForTitanDB(&db_options_2pc, &column_families_copy,
                         &compaction_enabled_cf_indices);
-  const bool use_seq_per_batch = txn_db_options.write_policy == WRITE_PREPARED;
+  //const bool use_seq_per_batch = txn_db_options.write_policy == WRITE_PREPARED;
   s = titandb::TitanDB::Open(db_options_2pc, dbname, column_families_copy, handles, &db);
   if (s.ok()) {
     s = WrapDB(db, txn_db_options, compaction_enabled_cf_indices, *handles,
