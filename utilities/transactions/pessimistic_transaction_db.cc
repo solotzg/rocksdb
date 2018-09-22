@@ -27,6 +27,7 @@
 #include "utilities/transactions/transaction_db_mutex_impl.h"
 #include "utilities/transactions/write_prepared_txn_db.h"
 #include "utilities/transactions/write_unprepared_txn_db.h"
+#include "utilities/titandb/db.h"
 
 namespace rocksdb {
 
@@ -237,6 +238,60 @@ Status TransactionDB::Open(
   }
   return s;
 }
+
+Status TransactionDB::OpenTitanDB(
+    const titandb::TitanDBOptions& db_options, const TransactionDBOptions& txn_db_options,
+    const std::string& dbname,
+    const std::vector<titandb::TitanCFDescriptor>& column_families,
+    std::vector<ColumnFamilyHandle*>* handles, TransactionDB** dbptr) {
+  
+  Status s;
+  titandb::TitanDB* db = nullptr;
+
+  ROCKS_LOG_WARN(db_options.info_log, "Transaction write_policy is %"
+                 PRId32,
+                 static_cast<int>(txn_db_options.write_policy));
+  std::vector<titandb::TitanCFDescriptor> column_families_copy = column_families;
+  std::vector<size_t> compaction_enabled_cf_indices;
+  titandb::TitanDBOptions db_options_2pc = db_options;
+  PrepareWrapForTitanDB(&db_options_2pc, &column_families_copy,
+                        &compaction_enabled_cf_indices);
+  const bool use_seq_per_batch = txn_db_options.write_policy == WRITE_PREPARED;
+  s = titandb::TitanDB::Open(db_options_2pc, dbname, column_families_copy, handles, &db);
+  if (s.ok()) {
+    s = WrapDB(db, txn_db_options, compaction_enabled_cf_indices, *handles,
+               dbptr);
+  }
+  if (!s.ok()) {
+    // just in case it was not deleted (and not set to nullptr).
+    delete db;
+  }
+  return s;
+}
+
+void TransactionDB::PrepareWrapForTitanDB(
+    titandb::TitanDBOptions* db_options, std::vector<titandb::TitanCFDescriptor>* column_families,
+    std::vector<size_t>* compaction_enabled_cf_indices) {
+  compaction_enabled_cf_indices->clear();
+
+  // Enable MemTable History if not already enabled
+  for (size_t i = 0; i < column_families->size(); i++) {
+
+    titandb::TitanCFOptions* cf_options = &(*column_families)[i].options;
+
+    if (cf_options->max_write_buffer_number_to_maintain == 0) {
+      // Setting to -1 will set the History size to max_write_buffer_number.
+      cf_options->max_write_buffer_number_to_maintain = -1;
+    }
+    if (!cf_options->disable_auto_compactions) {
+      // Disable compactions momentarily to prevent race with DB::Open
+      cf_options->disable_auto_compactions = true;
+      compaction_enabled_cf_indices->push_back(i);
+    }
+  }
+  db_options->allow_2pc = true;
+}
+
 
 void TransactionDB::PrepareWrap(
     DBOptions* db_options, std::vector<ColumnFamilyDescriptor>* column_families,

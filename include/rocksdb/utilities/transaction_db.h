@@ -14,6 +14,7 @@
 #include "rocksdb/db.h"
 #include "rocksdb/utilities/stackable_db.h"
 #include "rocksdb/utilities/transaction.h"
+#include "utilities/titandb/db.h"
 
 // Database with Transaction support.
 //
@@ -207,11 +208,24 @@ class TransactionDB : public StackableDB {
                      const std::vector<ColumnFamilyDescriptor>& column_families,
                      std::vector<ColumnFamilyHandle*>* handles,
                      TransactionDB** dbptr);
+  
+  static Status OpenTitanDB(const titandb::TitanDBOptions& db_options,
+			    const TransactionDBOptions& txn_db_options,
+			    const std::string& dbname,
+			    const std::vector<titandb::TitanCFDescriptor>& column_families,
+			    std::vector<ColumnFamilyHandle*>* handles,
+			    TransactionDB** dbptr);
+
   // Note: PrepareWrap() may change parameters, make copies before the
   // invocation if needed.
   static void PrepareWrap(DBOptions* db_options,
                           std::vector<ColumnFamilyDescriptor>* column_families,
                           std::vector<size_t>* compaction_enabled_cf_indices);
+
+  static void PrepareWrapForTitanDB(titandb::TitanDBOptions* db_options,
+                                    std::vector<titandb::TitanCFDescriptor>* column_families,
+                                    std::vector<size_t>* compaction_enabled_cf_indices);
+
   // If the return status is not ok, then dbptr will bet set to nullptr. The
   // input db parameter might or might not be deleted as a result of the
   // failure. If it is properly deleted it will be set to nullptr. If the return
