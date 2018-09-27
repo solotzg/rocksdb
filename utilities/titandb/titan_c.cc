@@ -43,7 +43,7 @@ static bool SaveError(char** errptr, const Status& s) {
 
 rocksdb_t* titandb_open(const titandb_options_t* options, const char* name,
                         char** errptr) {
-  TitanDB* db;
+  DB* db;
   if (SaveError(errptr, TitanDB::Open(options->rep, name, &db))) {
     return nullptr;
   }

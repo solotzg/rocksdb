@@ -246,7 +246,7 @@ Status TransactionDB::OpenTitanDB(
     std::vector<ColumnFamilyHandle*>* handles, TransactionDB** dbptr) {
   
   Status s;
-  titandb::TitanDB* db = nullptr;
+  DB* db = nullptr;
 
   ROCKS_LOG_WARN(db_options.info_log, "Transaction write_policy is %"
                  PRId32,

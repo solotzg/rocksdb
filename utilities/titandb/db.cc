@@ -6,7 +6,7 @@ namespace rocksdb {
 namespace titandb {
 
 Status TitanDB::Open(const TitanOptions& options, const std::string& dbname,
-                     TitanDB** db) {
+                     DB** db) {
   TitanDBOptions db_options(options);
   TitanCFOptions cf_options(options);
   std::vector<TitanCFDescriptor> descs;
@@ -24,7 +24,7 @@ Status TitanDB::Open(const TitanOptions& options, const std::string& dbname,
 Status TitanDB::Open(const TitanDBOptions& db_options,
                      const std::string& dbname,
                      const std::vector<TitanCFDescriptor>& descs,
-                     std::vector<ColumnFamilyHandle*>* handles, TitanDB** db) {
+                     std::vector<ColumnFamilyHandle*>* handles, DB** db) {
   auto impl = new TitanDBImpl(db_options, dbname);
   auto s = impl->Open(descs, handles);
   if (s.ok()) {
