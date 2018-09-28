@@ -14,13 +14,19 @@
 #include "rocksdb/db.h"
 #include "rocksdb/utilities/stackable_db.h"
 #include "rocksdb/utilities/transaction.h"
-#include "utilities/titandb/db.h"
 
 // Database with Transaction support.
 //
 // See transaction.h and examples/transaction_example.cc
 
 namespace rocksdb {
+
+namespace titandb{
+
+struct TitanDBOptions;
+struct TitanCFDescriptor;
+
+}
 
 class TransactionDBMutexFactory;
 
