@@ -26,7 +26,7 @@ struct TitanCFOptions : public ColumnFamilyOptions {
   // this threshold will be inlined in base DB.
   //
   // Default: 4096
-  uint64_t min_blob_size{4096};
+  uint64_t min_blob_size{0};
 
   // The compression algorithm used to compress data in blob files.
   //
